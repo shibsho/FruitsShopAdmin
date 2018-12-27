@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h2>果物マスタ管理</h2>
+<p><a href="{% url 'items:register' %}">新規追加</a></p>
+
+{% for message in messages %}
+    {{ message }}
+{% endfor %}
+
+<table>
+    <tr>
+        <th>ID</th>
+        <th>名称</th>
+        <th>単価</th>
+        <th>登録日時</th>
+        <th>更新日時</th>
+    </tr>
+    {% for item in items %}
+    <tr>
+        <td>{{ item.pk }}</td>
+        <td>{{ item }}</td>
+        <td>{{ item.price }}</td>
+        <td>{{ item.created_at }}</td>
+        <td>{{ item.updated_at }}</td>
+        <td>
+            <button><a href="{% url 'items:edit' item.pk %}">編集</a></button>
+        </td>
+        <td>
+            <form method="post" action="{% url 'items:delete' item.pk %}">{% csrf_token %}
+                <button class="btn" type="submit">削除</button>
+            </form>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+
+
+{% endblock %}
