@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h2>販売情報管理</h2>
+<p><a href="">新規追加</a></p>
+
+{% for message in messages %}
+    {{ message }}
+{% endfor %}
+
+<table>
+    <tr>
+        <th>ID</th>
+        <th>果物</th>
+        <th>個数</th>
+        <th>売上</th>
+        <th>販売日時</th>
+    </tr>
+    {% for sale in sales %}
+    <tr>
+        <td>{{ sale.pk }}</td>
+        <td>{{ sale.item }}</td>
+        <td>{{ sale.number }}</td>
+        <td>{{ sale.get_amount }}</td>
+        <td>{{ sale.saled_at }}</td>
+        <td>
+            <button><a href="">編集</a></button>
+        </td>
+        <td>
+            <form method="post" action="">{% csrf_token %}
+                <button class="btn" type="submit">削除</button>
+            </form>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+
+
+{% endblock %}
