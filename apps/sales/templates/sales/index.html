@@ -3,7 +3,7 @@
 {% block content %}
 
 <h2>販売情報管理</h2>
-<p><a href="">新規追加</a></p>
+<p><a href="{% url 'sales:register' %}">新規追加</a></p>
 
 {% for message in messages %}
     {{ message }}
@@ -22,13 +22,13 @@
         <td>{{ sale.pk }}</td>
         <td>{{ sale.item }}</td>
         <td>{{ sale.number }}</td>
-        <td>{{ sale.get_amount }}</td>
+        <td>{{ sale.amount }}</td>
         <td>{{ sale.saled_at }}</td>
         <td>
-            <button><a href="">編集</a></button>
+            <button><a href="{% url 'sales:edit' sale.pk %}">編集</a></button>
         </td>
         <td>
-            <form method="post" action="">{% csrf_token %}
+            <form method="post" action="{% url 'sales:delete' sale.pk %}">{% csrf_token %}
                 <button class="btn" type="submit">削除</button>
             </form>
         </td>
@@ -36,5 +36,10 @@
     {% endfor %}
 </table>
 
+<h3>CSV一括登録</h3>
+<form method="post" action="{% url 'sales:csv_upload' %}" enctype="multipart/form-data">{% csrf_token %}
+    <input type="file" name="file" size="300" required>
+    <input type="submit" value="アップロード">
+</form>
 
 {% endblock %}

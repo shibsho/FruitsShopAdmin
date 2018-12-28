@@ -22,5 +22,12 @@ class Item(models.Model):
         return get_object_or_404(cls, id=id)
 
     @classmethod
+    def get_by_name_or_none(cls, name):
+        try:
+            return cls.objects.get(name=name)
+        except:
+            return None
+
+    @classmethod
     def delete_by_id(cls, id):
         cls.objects.get(id=id).delete()

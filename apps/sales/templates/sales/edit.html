@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h2>販売情報編集</h2>
+<p><a href="{% url 'sales:index' %}">販売情報マスタ管理</a></p>
+
+<form action="{% url 'sales:edit' sale.pk %}" method="POST">{% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">更新</button>
+</form>
+
+{% endblock %}
