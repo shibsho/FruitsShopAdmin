@@ -2,17 +2,19 @@
 
 {% block content %}
 
-<h2>ログイン</h2>
-
 <form class="form-signin" method="post">{% csrf_token %}
-    {{ form.errors }}
+    {% if form.errors %}
+        <div class="message is-danger">
+            <p class="message-body">ユーザー名かパスワードに誤りがあります。</p>
+        </div>
+    {% endif %}
     <label>ユーザー名</label>
     <input name="username">
     <br>
     <label>パスワード</label>
     <input type="password" name="password">
     <br>
-    <button>ログイン</button>
+    <button class="button">ログイン</button>
 </form>
 
 {% endblock %}

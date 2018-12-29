@@ -9,5 +9,5 @@ urlpatterns = [
     path('<int:id>/edit/', views.edit, name='edit'),
     path('<int:id>/delete/', views.delete, name='delete'),
     path('csv_upload/', views.csv_upload, name='csv_upload'),
-    path('statics/', views.statics, name='statics')
+    path('statistics/', views.statistics, name='statistics')
 ]

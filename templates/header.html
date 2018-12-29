@@ -1,0 +1,22 @@
+<nav class="navbar" style="background-color:#000;">
+    <div class="container">
+        <div class="navbar-brand">
+            <a class="navbar-item" href="{% url 'home:index' %}">
+                <h1 class="title is-2" style="color:#FFF;">果物販売管理</h1>
+            </a>
+        </div>
+        <div class="navbar-menu">
+            <div class="navbar-end">
+                <div class="navbar-item">
+                    <div class="buttons">
+                        {% if request.user.is_authenticated %}
+                        <a class="button is-light" href="{% url 'home:logout' %}">
+                            <strong>ログアウト</strong>
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>

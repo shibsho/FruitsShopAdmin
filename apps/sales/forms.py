@@ -20,7 +20,7 @@ class SaleForm(ModelForm):
 
 	class Meta:
 		model = Sale
-		fields = ['item', 'number', 'saled_at']
+		fields = ['item', 'item_num', 'saled_at']
 
 
 	

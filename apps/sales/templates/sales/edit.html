@@ -2,12 +2,16 @@
 
 {% block content %}
 
-<h2>販売情報編集</h2>
-<p><a href="{% url 'sales:index' %}">販売情報マスタ管理</a></p>
+<h3 class="title is-3">販売情報編集</h3>
+<div>
+    <a href="{% url 'home:index' %}">トップ</a>
+     ＞ <a href="{% url 'sales:index' %}">販売情報管理</a>
+     ＞ 販売情報編集
+</div>
 
 <form action="{% url 'sales:edit' sale.pk %}" method="POST">{% csrf_token %}
     {{ form.as_p }}
-    <button type="submit">更新</button>
+    <button type="submit" class="button">更新</button>
 </form>
 
 {% endblock %}

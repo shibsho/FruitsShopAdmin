@@ -1,39 +1,66 @@
 {% extends 'base.html' %}
 
+{% load humanize %}
+
 {% block content %}
 
-<h2>果物マスタ管理</h2>
-<p><a href="{% url 'items:register' %}">新規追加</a></p>
+<h3 class="title is-3">果物マスタ管理</h3>
+
+<div>
+    <a href="{% url 'home:index' %}">トップ</a>
+    ＞ 果物マスタ管理
+</div>
 
 {% for message in messages %}
-    {{ message }}
+<div class="message">
+    <p class="message-body">{{ message }}</p>
+</div>
 {% endfor %}
 
-<table>
+<table class="table is-bordered">
     <tr>
         <th>ID</th>
         <th>名称</th>
         <th>単価</th>
         <th>登録日時</th>
         <th>更新日時</th>
+        <th></th>
+        <th></th>
     </tr>
-    {% for item in items %}
+    {% for item in contacts %}
     <tr>
         <td>{{ item.pk }}</td>
         <td>{{ item }}</td>
-        <td>{{ item.price }}</td>
+        <td>{{ item.price |intcomma }}</td>
         <td>{{ item.created_at }}</td>
         <td>{{ item.updated_at }}</td>
         <td>
-            <button><a href="{% url 'items:edit' item.pk %}">編集</a></button>
+            <a href="{% url 'items:edit' item.pk %}"><button class="button">編集</button></a>
         </td>
         <td>
             <form method="post" action="{% url 'items:delete' item.pk %}">{% csrf_token %}
-                <button class="btn" type="submit">削除</button>
+                <button class="button" type="submit">削除</button>
             </form>
         </td>
     </tr>
     {% endfor %}
 </table>
 
+<div class="pagination">
+    <span class="step-links">
+        {% if contacts.has_previous %}
+        <a href="?page=1">&laquo; first</a>
+        <a href="?page={{ contacts.previous_page_number }}">previous</a>
+        {% endif %}
+        <span class="current">
+            {{ contacts.number }} of {{ contacts.paginator.num_pages }}.
+        </span>
+        {% if contacts.has_next %}
+        <a href="?page={{ contacts.next_page_number }}">next</a>
+        <a href="?page={{ contacts.paginator.num_pages }}">last &raquo;</a>
+        {% endif %}
+    </span>
+</div>
+
+<p><a class="button" href="{% url 'items:register' %}">新規追加</a></p>
 {% endblock %}

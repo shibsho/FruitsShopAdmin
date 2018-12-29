@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+
+{% load humanize %}
+
+{% block content %}
+
+<h3 class="title is-3">販売統計情報</h3>
+
+<div>
+    <a href="{% url 'home:index' %}">トップ</a>
+    ＞ 販売統計情報
+</div>
+
+<h4 class="title is-4">累計</h4>
+<p class="is-size-3">{{ entire_sales_amount |intcomma }}円</p>
+
+<h4 class="title is-4">月別</h4>
+<div>
+    <table class="table is-bordered">
+        <tr>
+            <th>月</th>
+            <th>売上</th>
+            <th>内訳</th>
+        </tr>
+        {% for report in monthly_sale_reports_list %}
+
+        <tr>
+            <td>{{ report.year }}年{{ report.month }}月</td>
+            <td>{{ report.amount |intcomma }}円</td>
+            <td>
+                {% for item_report in report.item_reports %}
+                    {{ item_report.item }}:{{ item_report.amount |intcomma }}円（{{ item_report.item_num }}）
+                {% endfor %}
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+</div>
+
+
+<h4 class="title is-4">日別</h4>
+<div>
+    <table class="table is-bordered">
+        <tr>
+            <th>日</th>
+            <th>売上</th>
+            <th>内訳</th>
+        </tr>
+        {% for report in daily_sale_reports_list %}
+
+        <tr>
+            <td>{{ report.year }}年{{ report.month }}月{{ report.day }}日</td>
+            <td>{{ report.amount |intcomma }}円</td>
+            <td>
+                {% for item_report in report.item_reports %}
+                    {{ item_report.item }}:{{ item_report.amount |intcomma }}円（{{ item_report.item_num }}）
+                {% endfor %}
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+</div>
+
+{% endblock %}

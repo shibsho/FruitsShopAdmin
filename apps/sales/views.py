@@ -2,18 +2,24 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
 from django.contrib import messages
+from django.core.paginator import Paginator
 from io import TextIOWrapper
-import csv
-import datetime
+import csv, datetime
+from dateutil.relativedelta import relativedelta
 from .models import Sale
 from apps.items.models import Item
 from .forms import SaleForm
+from django.db.models import Sum
 
 @login_required
 def index(request):
-    sales = Sale.get_all_objects()
+    sales = Sale.get_all_object().order_by('-saled_at')
+    paginator = Paginator(sales, 10)
+    page = request.GET.get('page')
+    contacts = paginator.get_page(page)
     return render(request, 'sales/index.html', {
         'sales': sales,
+        'contacts': contacts
     })
 
 
@@ -22,8 +28,7 @@ def register(request):
     if request.method == "POST":
         form = SaleForm(request.POST)
         if form.is_valid():
-            sale = form.save(commit=False)
-            sale.save(calc_amount=True)
+            form.save()
             messages.success(request, "登録が完了しました。")
         else:
             messages.error(request, "登録に失敗しました。")
@@ -68,9 +73,9 @@ def csv_upload(request):
         csv_file = TextIOWrapper(f.file, encoding='utf-8')
         data = csv.reader(csv_file)
 
-        def validate_data(number, amount, saled_at):
+        def validate_data(item_num, amount, saled_at):
             try:
-                int(number)
+                int(item_num)
                 int(amount)
                 datetime.datetime.strptime(row[3], "%Y-%m-%d %H:%M")
             except:
@@ -79,13 +84,13 @@ def csv_upload(request):
 
         for row in data:
             item = Item.get_by_name_or_none(row[0])
-            number = row[1]
+            item_num = row[1]
             amount = row[2]
             saled_at = row[3]
-            if item is not None and validate_data(number, amount, saled_at):
+            if item is not None and validate_data(item_num, amount, saled_at):
                 Sale.objects.create(
                     item=item,
-                    number=int(row[1]),
+                    item_num=int(row[1]),
                     amount = int(row[2]),
                     saled_at=datetime.datetime.strptime(row[3], "%Y-%m-%d %H:%M")
                     )
@@ -97,8 +102,19 @@ def csv_upload(request):
 
 
 @login_required
-def statics(request):
-    entire_period_amount = Sale.get_entire_period_amount()
-    return render(request, 'sales/statics.html',{
-        'entire_period_amount': entire_period_amount,
+def statistics(request):
+    # 全期間
+    entire_sales = Sale.get_all_object()
+    entire_sales_amount = Sale.total_amount_of_queryset(entire_sales)
+
+    today = datetime.date.today()
+    # 過去３ヶ月
+    monthly_sale_reports_list = Sale.get_recent_monthly_reports_list(3, today)
+    # 過去３日
+    daily_sale_reports_list = Sale.get_recent_daily_reports_list(3, today)
+
+    return render(request, 'sales/statistics.html',{
+        'entire_sales_amount': entire_sales_amount,
+        'monthly_sale_reports_list': monthly_sale_reports_list,
+        'daily_sale_reports_list': daily_sale_reports_list,
     })

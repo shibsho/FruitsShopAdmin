@@ -26,6 +26,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.humanize',
     'apps.home',
     'apps.user',
     'apps.items',
@@ -117,3 +118,5 @@ AUTH_USER_MODEL = 'user.User'
 LOGIN_URL = 'home:login'
 LOGIN_REDIRECT_URL = 'home:index'
 LOGOUT_REDIRECT_URL = 'home:index'
+
+NUMBER_GROUPING = 3

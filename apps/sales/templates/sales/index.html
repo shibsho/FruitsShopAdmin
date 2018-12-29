@@ -1,42 +1,69 @@
 {% extends 'base.html' %}
 
+{% load humanize %}
+
 {% block content %}
 
-<h2>販売情報管理</h2>
-<p><a href="{% url 'sales:register' %}">新規追加</a></p>
+<h3 class="title is-3">販売情報管理</h3>
+
+<div>
+    <a href="{% url 'home:index' %}">トップ</a>
+     ＞ 販売情報管理
+</div>
 
 {% for message in messages %}
-    {{ message }}
+    <div class="message">
+        <p class="message-body">{{ message }}</p>
+    </div>
 {% endfor %}
 
-<table>
+
+<table class="table is-bordered">
     <tr>
-        <th>ID</th>
         <th>果物</th>
         <th>個数</th>
         <th>売上</th>
         <th>販売日時</th>
+        <th></th>
+        <th></th>
     </tr>
-    {% for sale in sales %}
+    {% for sale in contacts %}
     <tr>
-        <td>{{ sale.pk }}</td>
         <td>{{ sale.item }}</td>
-        <td>{{ sale.number }}</td>
-        <td>{{ sale.amount }}</td>
+        <td>{{ sale.item_num }}</td>
+        <td>{{ sale.amount |intcomma }}円</td>
         <td>{{ sale.saled_at }}</td>
         <td>
-            <button><a href="{% url 'sales:edit' sale.pk %}">編集</a></button>
+            <a href="{% url 'sales:edit' sale.pk %}"><button class="button">編集</button></a>
         </td>
         <td>
             <form method="post" action="{% url 'sales:delete' sale.pk %}">{% csrf_token %}
-                <button class="btn" type="submit">削除</button>
+                <button class="button" type="submit">削除</button>
             </form>
         </td>
     </tr>
     {% endfor %}
 </table>
 
-<h3>CSV一括登録</h3>
+<div class="pagination">
+    <span class="step-links">
+        {% if contacts.has_previous %}
+        <a href="?page=1">&laquo; first</a>
+        <a href="?page={{ contacts.previous_page_number }}">previous</a>
+        {% endif %}
+        <span class="current">
+            {{ contacts.number }} of {{ contacts.paginator.num_pages }}.
+        </span>
+        {% if contacts.has_next %}
+        <a href="?page={{ contacts.next_page_number }}">next</a>
+        <a href="?page={{ contacts.paginator.num_pages }}">last &raquo;</a>
+        {% endif %}
+    </span>
+</div>
+
+<p><a class="button" href="{% url 'sales:register' %}">販売情報登録</a></p>
+
+<h4 class="title is-4">CSV一括登録</h4>
 <form method="post" action="{% url 'sales:csv_upload' %}" enctype="multipart/form-data">{% csrf_token %}
     <input type="file" name="file" size="300" required>
     <input type="submit" value="アップロード">

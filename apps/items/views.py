@@ -2,14 +2,19 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
 from django.contrib import messages
+from django.core.paginator import Paginator
 from .models import Item
 from .forms import ItemForm
 
 @login_required
 def index(request):
     items = Item.get_all_objects()
+    paginator = Paginator(items, 10)
+    page = request.GET.get('page')
+    contacts = paginator.get_page(page)
     return render(request, 'items/index.html',{
         'items': items, 
+        'contacts': contacts
     })
 
 
