@@ -1,5 +1,11 @@
 # FruitsShopAdmin
-### Quick Start
+
+## Versions
+- Python3.6.6
+- Django2.1.4
+
+## Quick Start
+
 ```sh
 ## install dependencies
 $ pip install -r requirements.txt
@@ -11,10 +17,4 @@ $ python manage.py createsuperuser
 $ python manage.py runserver
 ## Access
 $ open http://localhost:8000/
-```
-### Dependency
-#### requirements.txt
-```sh
-$ vim requirements.txt
-$ pip install -r requirements.txt
 ```
