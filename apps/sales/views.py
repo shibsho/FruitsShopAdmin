@@ -107,11 +107,10 @@ def statistics(request):
     entire_sales = Sale.get_all_object()
     entire_sales_amount = Sale.total_amount_of_queryset(entire_sales)
 
-    today = datetime.date.today()
     # 過去３ヶ月
-    monthly_sale_reports_list = Sale.get_recent_monthly_reports_list(3, today)
+    monthly_sale_reports_list = Sale.get_recent_monthly_reports_list(3)
     # 過去３日
-    daily_sale_reports_list = Sale.get_recent_daily_reports_list(3, today)
+    daily_sale_reports_list = Sale.get_recent_daily_reports_list(3)
 
     return render(request, 'sales/statistics.html',{
         'entire_sales_amount': entire_sales_amount,
