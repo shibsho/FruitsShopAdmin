@@ -12,9 +12,3 @@ $ python manage.py runserver
 ## Access
 $ open http://localhost:8000/
 ```
-### Dependency
-#### requirements.txt
-```sh
-$ vim requirements.txt
-$ pip install -r requirements.txt
-```
