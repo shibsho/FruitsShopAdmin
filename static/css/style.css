@@ -1,0 +1,20 @@
+.navbar {
+    background-color:#000;
+}
+
+.navbar-item > .title {
+    color:#FFF;
+}
+
+.container.base-content {
+    padding-top: 50px;
+    padding-bottom: 50px;
+}
+
+.pagination {
+    margin-bottom:50px;
+}
+
+.current {
+    font-size:20px;
+}

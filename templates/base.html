@@ -5,14 +5,14 @@
 
 <head>
     <title>果物販売管理</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}">
+    <meta name="viewport" content="width=device-width, initial-scale=1">   
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.2/css/bulma.css">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}">
 </head>
 
 <body>
     {% include 'header.html' %}
-    <div class="container" style="padding-top:50px; padding-bottom:50px;">
+    <div class="container base-content">
         {% block content %}{% endblock %}
     </div>
 </body>
