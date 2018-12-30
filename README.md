@@ -1,5 +1,11 @@
 # FruitsShopAdmin
-### Quick Start
+
+## Versions
+- Python3.6.6
+- Django2.1.4
+
+## Quick Start
+
 ```sh
 ## install dependencies
 $ pip install -r requirements.txt
