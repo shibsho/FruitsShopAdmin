@@ -16,10 +16,9 @@ def index(request):
     sales = Sale.get_all_object().order_by('-saled_at')
     paginator = Paginator(sales, 10)
     page = request.GET.get('page')
-    contacts = paginator.get_page(page)
+    sales = paginator.get_page(page)
     return render(request, 'sales/index.html', {
         'sales': sales,
-        'contacts': contacts
     })
 
 

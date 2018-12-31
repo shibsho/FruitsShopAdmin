@@ -11,10 +11,9 @@ def index(request):
     items = Item.get_all_objects()
     paginator = Paginator(items, 10)
     page = request.GET.get('page')
-    contacts = paginator.get_page(page)
+    items = paginator.get_page(page)
     return render(request, 'items/index.html',{
-        'items': items, 
-        'contacts': contacts
+        'items': items,
     })
 
 
