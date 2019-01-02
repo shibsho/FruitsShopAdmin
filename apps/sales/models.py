@@ -71,7 +71,7 @@ class Sale(models.Model):
         today = datetime.date.today()
         monthly_sale_reports_list = list()
         for i in range(0, span):
-            # 月間売上情報=monthly_sale_report(dict) を３ヶ月分作り、各々をmonthly_sale_reports_listに格納
+            # 月間売上情報=monthly_sale_report(dict) を{span}ヶ月分作り、各々をmonthly_sale_reports_listに格納
             monthly_sale_report = dict()
             search_day = today + relativedelta(months=-i)
             year = search_day.year
@@ -114,7 +114,7 @@ class Sale(models.Model):
         today = datetime.date.today()
         daily_sale_reports_list = list()
         for i in range(0, span):
-            # 日間売上情報=daily_sale_report(dict) を３ヶ月分作り、各々をdaily_sale_reports_listに格納
+            # 日間売上情報=daily_sale_report(dict) を{span}日分作り、各々をdaily_sale_reports_listに格納
             daily_sale_report = dict()
             search_day = today + relativedelta(days=-i)
             year = search_day.year
