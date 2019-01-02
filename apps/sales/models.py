@@ -76,7 +76,7 @@ class Sale(models.Model):
             search_day = today + relativedelta(months=-i)
             year = search_day.year
             month = search_day.month
-            monthly_sales = Sale.find_by_year_month(year, month)
+            monthly_sales = cls.find_by_year_month(year, month)
             # 果物ごとの集計情報を作成する
             item_reports = list()
             for item in monthly_sales.values_list('item__name', flat=True).distinct():
@@ -84,12 +84,12 @@ class Sale(models.Model):
                 item_report = dict()
                 item_sales = monthly_sales.filter(item__name=item)
                 item_report['item'] = item
-                item_report['item_num'] = Sale.total_item_num_of_queryset(item_sales)
-                item_report['amount'] = Sale.total_amount_of_queryset(item_sales)
+                item_report['item_num'] = cls.total_item_num_of_queryset(item_sales)
+                item_report['amount'] = cls.total_amount_of_queryset(item_sales)
                 item_reports.append(item_report)
             monthly_sale_report["year"] = year
             monthly_sale_report["month"] = month
-            monthly_sale_report["amount"] = Sale.total_amount_of_queryset(
+            monthly_sale_report["amount"] = cls.total_amount_of_queryset(
             monthly_sales)
             monthly_sale_report["item_reports"] = item_reports
 
@@ -120,7 +120,7 @@ class Sale(models.Model):
             year = search_day.year
             month = search_day.month
             day = search_day.day
-            daily_sales = Sale.find_by_year_month_day(year, month, day)
+            daily_sales = cls.find_by_year_month_day(year, month, day)
             # 果物ごとの集計情報を作成する
             item_reports = list()
             for item in daily_sales.values_list('item__name', flat=True).distinct():
@@ -128,13 +128,13 @@ class Sale(models.Model):
                 item_report = dict()
                 item_sales = daily_sales.filter(item__name=item)
                 item_report['item'] = item
-                item_report['item_num'] = Sale.total_item_num_of_queryset(item_sales)
-                item_report['amount'] = Sale.total_amount_of_queryset(item_sales)
+                item_report['item_num'] = cls.total_item_num_of_queryset(item_sales)
+                item_report['amount'] = cls.total_amount_of_queryset(item_sales)
                 item_reports.append(item_report)
             daily_sale_report["year"] = year
             daily_sale_report["month"] = month
             daily_sale_report["day"] = day
-            daily_sale_report["amount"] = Sale.total_amount_of_queryset(daily_sales)
+            daily_sale_report["amount"] = cls.total_amount_of_queryset(daily_sales)
             daily_sale_report["item_reports"] = item_reports
 
             # daily_sales_report_listに格納
