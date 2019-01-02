@@ -139,5 +139,4 @@ class Sale(models.Model):
 
             # daily_sales_report_listに格納
             daily_sale_reports_list.append(daily_sale_report)
-            print(daily_sale_report)
         return daily_sale_reports_list
