@@ -50,7 +50,7 @@ class Sale(models.Model):
     
     @staticmethod
     def total_item_num_of_queryset(queryset):
-        # 販売情報クエリセットの総個数を取得
+        # 販売情報クエリセットの果物総個数を取得
         if queryset.exists():
             return queryset.aggregate(Sum('item_num'))['item_num__sum']
         return 0
