@@ -88,8 +88,8 @@ class Sale(models.Model):
         """
 
         # 対象月のタプル(yyyy,mm)を作り、monthly_sale_reportsのキーとして設定
-        today = datetime.date.today()
         monthly_sale_reports = OrderedDict()
+        today = datetime.date.today()
         YearMonth = namedtuple('YearMonth', ('year', 'month'))
         for i in range(0, span):
             day = today + relativedelta(months=-i)
@@ -133,7 +133,7 @@ class Sale(models.Model):
     def get_recent_daily_reports(cls, span):
         """
         直近数日（span）分の日間売上情報をdictで返す
-        月間売上情報dict（daily_sale_reports） は以下の形式
+        日間売上情報dict（daily_sale_reports） は以下の形式
         {
             (2018,12,31):{
                 'amount': 400, 
@@ -153,8 +153,8 @@ class Sale(models.Model):
         """
 
         # 対象日のタプル(yyyy,mm,dd)を作り、daily_sale_reportsのキーとして設定
-        today = datetime.date.today()
         daily_sale_reports = OrderedDict()
+        today = datetime.date.today()
         YearMonthDay = namedtuple('YearMonthDay', ('year', 'month', 'day'))
         for i in range(0, span):
             day = today + relativedelta(days=-i)
