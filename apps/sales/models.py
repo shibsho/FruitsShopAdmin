@@ -57,6 +57,14 @@ class Sale(models.Model):
         return 0
     
     @classmethod
+    def get_entire_amount(cls):
+        sales = cls.objects.all()
+        amount = 0
+        for sale in sales:
+            amount += sale.amount
+        return amount
+    
+    @classmethod
     def get_recent_monthly_reports(cls, span):
         """
         直近数ヶ月（span）分の月間売上情報をdictで返す
@@ -79,7 +87,7 @@ class Sale(models.Model):
         }
         """
 
-        # 対象期間月のタプル(yyyy,mm)を作り、monthly_sale_reportsのキーとして設定
+        # 対象月のタプル(yyyy,mm)を作り、monthly_sale_reportsのキーとして設定
         today = datetime.date.today()
         monthly_sale_reports = OrderedDict()
         YearMonth = namedtuple('YearMonth', ('year', 'month'))
@@ -96,7 +104,7 @@ class Sale(models.Model):
 
         sales = Sale.objects.all()
         for sale in sales:
-            # saleの販売日をタプルに変換 => (2018,12,31)
+            # saleの販売日をタプルに変換 => (2018,12)
             saled_at_date = localtime(sale.saled_at).date()
             saled_at = YearMonth(
                 year=saled_at_date.year,
@@ -144,7 +152,7 @@ class Sale(models.Model):
         }
         """
 
-        # 対象期間日のタプル(yyyy,mm,dd)を作り、daily_sale_reportsのキーとして設定
+        # 対象日のタプル(yyyy,mm,dd)を作り、daily_sale_reportsのキーとして設定
         today = datetime.date.today()
         daily_sale_reports = OrderedDict()
         YearMonthDay = namedtuple('YearMonthDay', ('year', 'month', 'day'))

@@ -103,12 +103,9 @@ def csv_upload(request):
 @login_required
 def statistics(request):
     # 全期間
-    entire_sales = Sale.get_all_object()
-    entire_sales_amount = Sale.total_amount_of_queryset(entire_sales)
-
+    entire_sales_amount = Sale.get_entire_amount()
     # 過去３ヶ月
     monthly_sale_reports = Sale.get_recent_monthly_reports(3)
-
     # 過去３日
     daily_sale_reports = Sale.get_recent_daily_reports(3)
 
