@@ -22,14 +22,13 @@
             <th>売上</th>
             <th>内訳</th>
         </tr>
-        {% for report in monthly_sale_reports_list %}
-
+        {% for YearMonth, monthly_sale_report in monthly_sale_reports.items %}
         <tr>
-            <td>{{ report.year }}年{{ report.month }}月</td>
-            <td>{{ report.amount |intcomma }}円</td>
+            <td>{{ YearMonth.year }}年{{ YearMonth.month }}月</td>
+            <td>{{ monthly_sale_report.amount |intcomma }}円</td>
             <td>
-                {% for item_report in report.item_reports %}
-                    {{ item_report.item }}:{{ item_report.amount |intcomma }}円（{{ item_report.item_num }}）
+                {% for item, report in monthly_sale_report.item_reports.items %}
+                    {{ item }}:{{ report.amount |intcomma }}円（{{ report.item_num }}個）
                 {% endfor %}
             </td>
         </tr>
@@ -37,23 +36,21 @@
     </table>
 </div>
 
-
 <h4 class="title is-4">日別</h4>
 <div>
     <table class="table is-bordered">
         <tr>
-            <th>日</th>
+            <th>日付</th>
             <th>売上</th>
             <th>内訳</th>
         </tr>
-        {% for report in daily_sale_reports_list %}
-
+        {% for YearMonthDay, daily_sale_report in daily_sale_reports.items %}
         <tr>
-            <td>{{ report.year }}年{{ report.month }}月{{ report.day }}日</td>
-            <td>{{ report.amount |intcomma }}円</td>
+            <td>{{ YearMonthDay.year }}年{{ YearMonthDay.month }}月{{ YearMonthDay.day }}日</td>
+            <td>{{ daily_sale_report.amount |intcomma }}円</td>
             <td>
-                {% for item_report in report.item_reports %}
-                    {{ item_report.item }}:{{ item_report.amount |intcomma }}円（{{ item_report.item_num }}）
+                {% for item, report in daily_sale_report.item_reports.items %}
+                {{ item }}:{{ report.amount |intcomma }}円（{{ report.item_num }}個）
                 {% endfor %}
             </td>
         </tr>

@@ -1,9 +1,10 @@
+from django.utils.timezone import localtime
+import datetime
 from django.db import models
-from django.utils import timezone
 from django.shortcuts import get_object_or_404
 from django.db.models import Sum
 from dateutil.relativedelta import relativedelta
-import datetime
+from collections import OrderedDict, namedtuple
 from apps.items.models import Item
 
 
@@ -56,87 +57,133 @@ class Sale(models.Model):
         return 0
     
     @classmethod
-    def get_recent_monthly_reports_list(cls, span):
+    def get_recent_monthly_reports(cls, span):
         """
-        直近数ヶ月（span）分の月間売上情報をリストで返す
-        月間売上情報（monthly_sale_report）は以下の形式
-        {   'year': 2018,
-            'month': 12,
-            'amount': 400, 
-            'item_reports': [
-                {'item': 'バナナ', 'item_num': 2, 'amount': 100},
-                {'item': 'ぶどう', 'item_num': 3, 'amount': 300}
-            ]}
+        直近数ヶ月（span）分の月間売上情報をdictで返す
+        月間売上情報dict（monthly_sale_reports） は以下の形式
+        {
+            (2018,12):{
+                'amount': 400, 
+                'item_reports': {
+                    'バナナ': {'item_num': 2, 'amount': 100},
+                    'ぶどう': {'item_num': 3, 'amount': 300}
+                }
+            },
+            (2018,11):{
+                'amount': 400, 
+                'item_reports': {
+                    'バナナ': {'item_num': 2, 'amount': 100},
+                    'ぶどう': {'item_num': 3, 'amount': 300}
+                }
+            }
+        }
         """
-        today = datetime.date.today()
-        monthly_sale_reports_list = list()
-        for i in range(0, span):
-            # 月間売上情報=monthly_sale_report(dict) を{span}ヶ月分作り、各々をmonthly_sale_reports_listに格納
-            monthly_sale_report = dict()
-            search_day = today + relativedelta(months=-i)
-            year = search_day.year
-            month = search_day.month
-            monthly_sales = cls.find_by_year_month(year, month)
-            # 果物ごとの集計情報を作成する
-            item_reports = list()
-            for item in monthly_sales.values_list('item__name', flat=True).distinct():
-                # 特定の果物についての売上情報を作成する
-                item_report = dict()
-                item_sales = monthly_sales.filter(item__name=item)
-                item_report['item'] = item
-                item_report['item_num'] = cls.total_item_num_of_queryset(item_sales)
-                item_report['amount'] = cls.total_amount_of_queryset(item_sales)
-                item_reports.append(item_report)
-            monthly_sale_report["year"] = year
-            monthly_sale_report["month"] = month
-            monthly_sale_report["amount"] = cls.total_amount_of_queryset(
-            monthly_sales)
-            monthly_sale_report["item_reports"] = item_reports
 
-            # monthly_sales_report_listに格納
-            monthly_sale_reports_list.append(monthly_sale_report)
-        return monthly_sale_reports_list
+        # 対象期間月のタプル(yyyy,mm)を作り、monthly_sale_reportsのキーとして設定
+        today = datetime.date.today()
+        monthly_sale_reports = OrderedDict()
+        YearMonth = namedtuple('YearMonth', ('year', 'month'))
+        for i in range(0, span):
+            day = today + relativedelta(months=-i)
+            year_month = YearMonth(
+                year=day.year,
+                month=day.month
+                )
+            monthly_sale_reports[year_month] = {
+                'amount': 0,
+                'item_reports': {}
+            }
+
+        sales = Sale.objects.all()
+        for sale in sales:
+            # saleの販売日をタプルに変換 => (2018,12,31)
+            saled_at_date = localtime(sale.saled_at).date()
+            saled_at = YearMonth(
+                year=saled_at_date.year,
+                month=saled_at_date.month,
+            )
+
+            # 対象期間外のsaleであれば何も処理しない
+            if saled_at not in monthly_sale_reports.keys():
+                continue
+
+            # 対象月の売上総額を加算
+            monthly_sale_reports[saled_at]['amount'] += sale.amount
+            # item_reportsにsaleの果物がキーとして存在するとき
+            if sale.item.name in monthly_sale_reports[saled_at]['item_reports']:
+                monthly_sale_reports[saled_at]['item_reports'][sale.item.name]['item_num'] += sale.item_num
+                monthly_sale_reports[saled_at]['item_reports'][sale.item.name]['amount'] += sale.amount
+            # item_reportsにsaleの果物がキーとして存在しないとき
+            else:
+                monthly_sale_reports[saled_at]['item_reports'][sale.item.name] = {
+                    'item_num': sale.item_num,
+                    'amount': sale.amount
+                }
+        return monthly_sale_reports
 
     @classmethod
-    def get_recent_daily_reports_list(cls, span):
+    def get_recent_daily_reports(cls, span):
         """
-        直近数日（span）分の日間売上情報をリストで返す
-        日間売上情報（daily_sale_report）は以下の形式
-        {   'year': 2018,
-            'month': 12,
-            'day': 1,
-            'amount': 400, 
-            'item_reports': [
-                {'item': 'バナナ', 'item_num': 2, 'amount': 100},
-                {'item': 'ぶどう', 'item_num': 3, 'amount': 300}
-            ]}
+        直近数日（span）分の日間売上情報をdictで返す
+        月間売上情報dict（daily_sale_reports） は以下の形式
+        {
+            (2018,12,31):{
+                'amount': 400, 
+                'item_reports': {
+                    'バナナ': {'item_num': 2, 'amount': 100},
+                    'ぶどう': {'item_num': 3, 'amount': 300}
+                }
+            },
+            (2018,12,30):{
+                'amount': 400, 
+                'item_reports': {
+                    'バナナ': {'item_num': 2, 'amount': 100},
+                    'ぶどう': {'item_num': 3, 'amount': 300}
+                }
+            }
+        }
         """
-        today = datetime.date.today()
-        daily_sale_reports_list = list()
-        for i in range(0, span):
-            # 日間売上情報=daily_sale_report(dict) を{span}日分作り、各々をdaily_sale_reports_listに格納
-            daily_sale_report = dict()
-            search_day = today + relativedelta(days=-i)
-            year = search_day.year
-            month = search_day.month
-            day = search_day.day
-            daily_sales = cls.find_by_year_month_day(year, month, day)
-            # 果物ごとの集計情報を作成する
-            item_reports = list()
-            for item in daily_sales.values_list('item__name', flat=True).distinct():
-                # 特定の果物についての売上情報を作成する
-                item_report = dict()
-                item_sales = daily_sales.filter(item__name=item)
-                item_report['item'] = item
-                item_report['item_num'] = cls.total_item_num_of_queryset(item_sales)
-                item_report['amount'] = cls.total_amount_of_queryset(item_sales)
-                item_reports.append(item_report)
-            daily_sale_report["year"] = year
-            daily_sale_report["month"] = month
-            daily_sale_report["day"] = day
-            daily_sale_report["amount"] = cls.total_amount_of_queryset(daily_sales)
-            daily_sale_report["item_reports"] = item_reports
 
-            # daily_sales_report_listに格納
-            daily_sale_reports_list.append(daily_sale_report)
-        return daily_sale_reports_list
+        # 対象期間日のタプル(yyyy,mm,dd)を作り、daily_sale_reportsのキーとして設定
+        today = datetime.date.today()
+        daily_sale_reports = OrderedDict()
+        YearMonthDay = namedtuple('YearMonthDay', ('year', 'month', 'day'))
+        for i in range(0, span):
+            day = today + relativedelta(days=-i)
+            year_month_day = YearMonthDay(
+                year=day.year,
+                month=day.month,
+                day=day.day
+                )
+            daily_sale_reports[year_month_day] = {
+                'amount': 0,
+                'item_reports': {}
+            }
+        
+        sales = Sale.objects.all()
+        for sale in sales:
+            # saleの販売日をタプルに変換 => (2018,12,31)
+            saled_at_date = localtime(sale.saled_at).date()
+            saled_at = YearMonthDay(
+                year = saled_at_date.year,
+                month = saled_at_date.month,
+                day = saled_at_date.day
+                )
+
+            # 対象期間外のsaleであれば何も処理しない
+            if saled_at not in daily_sale_reports.keys():
+                continue
+
+            # 対象日の売上総額を加算
+            daily_sale_reports[saled_at]['amount'] += sale.amount
+            # item_reportsにsaleの果物がキーとして存在するとき
+            if sale.item.name in daily_sale_reports[saled_at]['item_reports']:
+                daily_sale_reports[saled_at]['item_reports'][sale.item.name]['item_num'] += sale.item_num
+                daily_sale_reports[saled_at]['item_reports'][sale.item.name]['amount'] += sale.amount
+            # item_reportsにsaleの果物がキーとして存在しないとき
+            else:
+                daily_sale_reports[saled_at]['item_reports'][sale.item.name] = {
+                    'item_num': sale.item_num,
+                    'amount': sale.amount
+                }
+        return daily_sale_reports

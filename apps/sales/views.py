@@ -107,12 +107,13 @@ def statistics(request):
     entire_sales_amount = Sale.total_amount_of_queryset(entire_sales)
 
     # 過去３ヶ月
-    monthly_sale_reports_list = Sale.get_recent_monthly_reports_list(3)
+    monthly_sale_reports = Sale.get_recent_monthly_reports(3)
+
     # 過去３日
-    daily_sale_reports_list = Sale.get_recent_daily_reports_list(3)
+    daily_sale_reports = Sale.get_recent_daily_reports(3)
 
     return render(request, 'sales/statistics.html',{
         'entire_sales_amount': entire_sales_amount,
-        'monthly_sale_reports_list': monthly_sale_reports_list,
-        'daily_sale_reports_list': daily_sale_reports_list,
+        'monthly_sale_reports': monthly_sale_reports,
+        'daily_sale_reports': daily_sale_reports,
     })
