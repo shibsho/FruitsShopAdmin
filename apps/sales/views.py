@@ -113,7 +113,8 @@ def statistics(request):
     entire_sales_amount = 0
 
     """
-    直近3ヶ月分の月間売上情報dict（monthly_sale_reports） は以下の形式
+    直近3ヶ月分の月間売上情報dict（monthly_sale_reports）と
+    直近3日分の日間売上情報dict（daily_sale_reports） を作る
     {
         (2018,12):{
             'amount': 400,
@@ -134,7 +135,11 @@ def statistics(request):
     # 対象月のタプル(yyyy,mm)を作り、monthly_sale_reportsのキーとして設定
     monthly_sale_reports = OrderedDict()
     YearMonth = namedtuple('YearMonth', ('year', 'month'))
+    # 対象日のタプル(yyyy,mm,dd)を作り、daily_sale_reportsのキーとして設定
+    daily_sale_reports = OrderedDict()
+    YearMonthDay = namedtuple('YearMonthDay', ('year', 'month', 'day'))
     for i in range(3):
+        # 月
         day = today + relativedelta(months=-i)
         year_month = YearMonth(
             year=day.year,
@@ -145,29 +150,7 @@ def statistics(request):
             'item_reports': {}
         }
 
-    """
-    直近3日分の日間売上情報dict（daily_sale_reports） は以下の形式
-    {
-        (2018,12,31):{
-            'amount': 400,
-            'item_reports': {
-                'バナナ': {'item_num': 2, 'amount': 100},
-                'ぶどう': {'item_num': 3, 'amount': 300}
-            }
-        },
-        (2018,12,30):{
-            'amount': 400,
-            'item_reports': {
-                'バナナ': {'item_num': 2, 'amount': 100},
-                'ぶどう': {'item_num': 3, 'amount': 300}
-            }
-        }
-    }
-    """
-    # 対象日のタプル(yyyy,mm,dd)を作り、daily_sale_reportsのキーとして設定
-    daily_sale_reports = OrderedDict()
-    YearMonthDay = namedtuple('YearMonthDay', ('year', 'month', 'day'))
-    for i in range(3):
+        # 日
         day = today + relativedelta(days=-i)
         year_month_day = YearMonthDay(
             year=day.year,
@@ -213,7 +196,7 @@ def statistics(request):
                 'item_num': sale.item_num,
                 'amount': sale.amount
             }
-        
+
         """ 過去3日間 """
         # saleの販売日をタプルに変換 => (2018,12,31)
         saled_at = YearMonthDay(
