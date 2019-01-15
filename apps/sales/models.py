@@ -91,7 +91,7 @@ class Sale(models.Model):
         monthly_sale_reports = OrderedDict()
         today = datetime.date.today()
         YearMonth = namedtuple('YearMonth', ('year', 'month'))
-        for i in range(0, span):
+        for i in range(span):
             day = today + relativedelta(months=-i)
             year_month = YearMonth(
                 year=day.year,
@@ -156,7 +156,7 @@ class Sale(models.Model):
         daily_sale_reports = OrderedDict()
         today = datetime.date.today()
         YearMonthDay = namedtuple('YearMonthDay', ('year', 'month', 'day'))
-        for i in range(0, span):
+        for i in range(span):
             day = today + relativedelta(days=-i)
             year_month_day = YearMonthDay(
                 year=day.year,
