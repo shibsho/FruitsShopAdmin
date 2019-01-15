@@ -13,7 +13,8 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='sale',
             name='amount',
-            field=models.PositiveIntegerField(default=33, editable=False, verbose_name='売上'),
+            field=models.PositiveIntegerField(
+                default=33, editable=False, verbose_name='売上'),
             preserve_default=False,
         ),
     ]

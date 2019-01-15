@@ -3,6 +3,6 @@ from .models import Item
 
 
 class ItemForm(ModelForm):
-	class Meta:
-		model = Item
-		fields = ['name', 'price']
+    class Meta:
+        model = Item
+        fields = ['name', 'price']

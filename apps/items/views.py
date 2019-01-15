@@ -6,13 +6,14 @@ from django.core.paginator import Paginator
 from .models import Item
 from .forms import ItemForm
 
+
 @login_required
 def index(request):
     items = Item.get_all_objects()
     paginator = Paginator(items, 10)
     page = request.GET.get('page')
     items = paginator.get_page(page)
-    return render(request, 'items/index.html',{
+    return render(request, 'items/index.html', {
         'items': items,
     })
 

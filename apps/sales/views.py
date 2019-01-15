@@ -4,12 +4,12 @@ from django.views.decorators.http import require_POST
 from django.contrib import messages
 from django.core.paginator import Paginator
 from io import TextIOWrapper
-import csv, datetime
-from dateutil.relativedelta import relativedelta
+import csv
+import datetime
 from .models import Sale
 from apps.items.models import Item
 from .forms import SaleForm
-from django.db.models import Sum
+
 
 @login_required
 def index(request):
@@ -77,7 +77,7 @@ def csv_upload(request):
                 int(item_num)
                 int(amount)
                 datetime.datetime.strptime(row[3], "%Y-%m-%d %H:%M")
-            except:
+            except ValueError:
                 return False
             return True
 
@@ -90,9 +90,10 @@ def csv_upload(request):
                 Sale.objects.create(
                     item=item,
                     item_num=int(row[1]),
-                    amount = int(row[2]),
-                    saled_at=datetime.datetime.strptime(row[3], "%Y-%m-%d %H:%M")
-                    )
+                    amount=int(row[2]),
+                    saled_at=datetime.datetime.strptime(
+                        row[3], "%Y-%m-%d %H:%M")
+                )
         return redirect('sales:index')
     # csv以外がアップロードされた場合
     else:
@@ -109,7 +110,7 @@ def statistics(request):
     # 過去３日
     daily_sale_reports = Sale.get_recent_daily_reports(3)
 
-    return render(request, 'sales/statistics.html',{
+    return render(request, 'sales/statistics.html', {
         'entire_sales_amount': entire_sales_amount,
         'monthly_sale_reports': monthly_sale_reports,
         'daily_sale_reports': daily_sale_reports,

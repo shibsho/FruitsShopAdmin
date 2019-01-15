@@ -1,5 +1,4 @@
 from django.db import models
-from django.utils import timezone
 from django.shortcuts import get_object_or_404
 
 
@@ -8,7 +7,6 @@ class Item(models.Model):
     price = models.PositiveIntegerField("単価")
     created_at = models.DateTimeField("登録日時", auto_now_add=True)
     updated_at = models.DateTimeField("更新日時", auto_now=True)
-
 
     def __str__(self):
         return self.name
@@ -25,7 +23,7 @@ class Item(models.Model):
     def get_by_name_or_none(cls, name):
         try:
             return cls.objects.get(name=name)
-        except:
+        except cls.DoesNotExist:
             return None
 
     @classmethod
