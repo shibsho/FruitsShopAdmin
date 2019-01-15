@@ -35,12 +35,15 @@ class Sale(models.Model):
     @classmethod
     def find_by_year_month(cls, year, month):
         # 指定された年月から、全ての販売情報を取得
-        return cls.objects.filter(saled_at__year=year).filter(saled_at__month=month)
+        return (cls.objects.filter(saled_at__year=year)
+                           .filter(saled_at__month=month))
 
     @classmethod
     def find_by_year_month_day(cls, year, month, day):
         # 指定された年月日から、全ての販売情報を取得
-        return cls.objects.filter(saled_at__year=year).filter(saled_at__month=month).filter(saled_at__day=day)
+        return (cls.objects.filter(saled_at__year=year)
+                           .filter(saled_at__month=month)
+                           .filter(saled_at__day=day))
 
     @staticmethod
     def total_amount_of_queryset(queryset):
@@ -48,14 +51,14 @@ class Sale(models.Model):
         if queryset.exists():
             return queryset.aggregate(Sum('amount'))['amount__sum']
         return 0
-    
+
     @staticmethod
     def total_item_num_of_queryset(queryset):
         # 販売情報クエリセットの果物総個数を取得
         if queryset.exists():
             return queryset.aggregate(Sum('item_num'))['item_num__sum']
         return 0
-    
+
     @classmethod
     def get_entire_amount(cls):
         sales = cls.objects.all()
@@ -63,7 +66,7 @@ class Sale(models.Model):
         for sale in sales:
             amount += sale.amount
         return amount
-    
+
     @classmethod
     def get_recent_monthly_reports(cls, span):
         """
@@ -71,14 +74,14 @@ class Sale(models.Model):
         月間売上情報dict（monthly_sale_reports） は以下の形式
         {
             (2018,12):{
-                'amount': 400, 
+                'amount': 400,
                 'item_reports': {
                     'バナナ': {'item_num': 2, 'amount': 100},
                     'ぶどう': {'item_num': 3, 'amount': 300}
                 }
             },
             (2018,11):{
-                'amount': 400, 
+                'amount': 400,
                 'item_reports': {
                     'バナナ': {'item_num': 2, 'amount': 100},
                     'ぶどう': {'item_num': 3, 'amount': 300}
@@ -96,7 +99,7 @@ class Sale(models.Model):
             year_month = YearMonth(
                 year=day.year,
                 month=day.month
-                )
+            )
             monthly_sale_reports[year_month] = {
                 'amount': 0,
                 'item_reports': {}
@@ -118,12 +121,16 @@ class Sale(models.Model):
             # 対象月の売上総額を加算
             monthly_sale_reports[saled_at]['amount'] += sale.amount
             # item_reportsにsaleの果物がキーとして存在するとき
-            if sale.item.name in monthly_sale_reports[saled_at]['item_reports']:
-                monthly_sale_reports[saled_at]['item_reports'][sale.item.name]['item_num'] += sale.item_num
-                monthly_sale_reports[saled_at]['item_reports'][sale.item.name]['amount'] += sale.amount
+            if (sale.item.name in
+                    monthly_sale_reports[saled_at]['item_reports']):
+                (monthly_sale_reports[saled_at]['item_reports']
+                 [sale.item.name]['item_num']) += sale.item_num
+                (monthly_sale_reports[saled_at]['item_reports']
+                 [sale.item.name]['amount']) += sale.amount
             # item_reportsにsaleの果物がキーとして存在しないとき
             else:
-                monthly_sale_reports[saled_at]['item_reports'][sale.item.name] = {
+                (monthly_sale_reports[saled_at]
+                 ['item_reports'][sale.item.name]) = {
                     'item_num': sale.item_num,
                     'amount': sale.amount
                 }
@@ -136,14 +143,14 @@ class Sale(models.Model):
         日間売上情報dict（daily_sale_reports） は以下の形式
         {
             (2018,12,31):{
-                'amount': 400, 
+                'amount': 400,
                 'item_reports': {
                     'バナナ': {'item_num': 2, 'amount': 100},
                     'ぶどう': {'item_num': 3, 'amount': 300}
                 }
             },
             (2018,12,30):{
-                'amount': 400, 
+                'amount': 400,
                 'item_reports': {
                     'バナナ': {'item_num': 2, 'amount': 100},
                     'ぶどう': {'item_num': 3, 'amount': 300}
@@ -162,21 +169,21 @@ class Sale(models.Model):
                 year=day.year,
                 month=day.month,
                 day=day.day
-                )
+            )
             daily_sale_reports[year_month_day] = {
                 'amount': 0,
                 'item_reports': {}
             }
-        
+
         sales = Sale.objects.all()
         for sale in sales:
             # saleの販売日をタプルに変換 => (2018,12,31)
             saled_at_date = localtime(sale.saled_at).date()
             saled_at = YearMonthDay(
-                year = saled_at_date.year,
-                month = saled_at_date.month,
-                day = saled_at_date.day
-                )
+                year=saled_at_date.year,
+                month=saled_at_date.month,
+                day=saled_at_date.day
+            )
 
             # 対象期間外のsaleであれば何も処理しない
             if saled_at not in daily_sale_reports.keys():
@@ -185,12 +192,16 @@ class Sale(models.Model):
             # 対象日の売上総額を加算
             daily_sale_reports[saled_at]['amount'] += sale.amount
             # item_reportsにsaleの果物がキーとして存在するとき
-            if sale.item.name in daily_sale_reports[saled_at]['item_reports']:
-                daily_sale_reports[saled_at]['item_reports'][sale.item.name]['item_num'] += sale.item_num
-                daily_sale_reports[saled_at]['item_reports'][sale.item.name]['amount'] += sale.amount
+            if (sale.item.name in
+                    daily_sale_reports[saled_at]['item_reports']):
+                (daily_sale_reports[saled_at]['item_reports']
+                 [sale.item.name]['item_num']) += sale.item_num
+                (daily_sale_reports[saled_at]['item_reports']
+                 [sale.item.name]['amount']) += sale.amount
             # item_reportsにsaleの果物がキーとして存在しないとき
             else:
-                daily_sale_reports[saled_at]['item_reports'][sale.item.name] = {
+                (daily_sale_reports[saled_at]
+                 ['item_reports'][sale.item.name]) = {
                     'item_num': sale.item_num,
                     'amount': sale.amount
                 }

@@ -13,6 +13,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='sale',
             name='amount',
-            field=models.PositiveIntegerField(editable=False, verbose_name='売上'),
+            field=models.PositiveIntegerField(
+                editable=False, verbose_name='売上'),
         ),
     ]

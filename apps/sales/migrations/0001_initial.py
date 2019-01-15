@@ -16,11 +16,13 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Sale',
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('id', models.AutoField(auto_created=True,
+                                        primary_key=True, serialize=False, verbose_name='ID')),
                 ('number', models.PositiveIntegerField(verbose_name='個数')),
                 ('amount', models.PositiveIntegerField(verbose_name='売上')),
                 ('saled_at', models.DateTimeField(verbose_name='販売日時')),
-                ('item', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='items.Item', verbose_name='果物')),
+                ('item', models.ForeignKey(
+                    on_delete=django.db.models.deletion.CASCADE, to='items.Item', verbose_name='果物')),
             ],
         ),
     ]
