@@ -82,7 +82,7 @@ def csv_upload(request):
             return True
 
         for row in data:
-            item = Item.objects.filter(name=row[0]).first()
+            item = Item.get_by_name_or_none(row[0])
             item_num = row[1]
             amount = row[2]
             saled_at = row[3]
