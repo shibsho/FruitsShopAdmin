@@ -162,7 +162,28 @@ def statistics(request):
             'item_reports': {}
         }
 
-    # 集計
+    # 集計関数
+    def aggregate_reports(sale_reports):
+        # 対象期間外のsaleであれば何も処理しない
+        if saled_at not in sale_reports.keys():
+            return
+
+        # 対象月の売上総額を加算
+        sale_reports[saled_at]['amount'] += sale.amount
+
+        # 果物に関する集計
+        reports = sale_reports[saled_at]['item_reports']
+        # item_reportsにsaleの果物がキーとして存在するとき
+        if sale.item.name in reports:
+            reports[sale.item.name]['item_num'] += sale.item_num
+            reports[sale.item.name]['amount'] += sale.amount
+        # item_reportsにsaleの果物がキーとして存在しないとき
+        else:
+            reports[sale.item.name] = {
+                'item_num': sale.item_num,
+                'amount': sale.amount
+            }
+    
     for sale in sales:
         saled_at_date = localtime(sale.saled_at).date()
 
@@ -176,26 +197,8 @@ def statistics(request):
             month=saled_at_date.month,
         )
 
-        # 対象期間外のsaleであれば何も処理しない
-        if saled_at not in monthly_sale_reports.keys():
-            continue
-
-        # 対象月の売上総額を加算
-        monthly_sale_reports[saled_at]['amount'] += sale.amount
-        # item_reportsにsaleの果物がキーとして存在するとき
-        if (sale.item.name in
-                monthly_sale_reports[saled_at]['item_reports']):
-            (monthly_sale_reports[saled_at]['item_reports']
-             [sale.item.name]['item_num']) += sale.item_num
-            (monthly_sale_reports[saled_at]['item_reports']
-             [sale.item.name]['amount']) += sale.amount
-        # item_reportsにsaleの果物がキーとして存在しないとき
-        else:
-            (monthly_sale_reports[saled_at]
-             ['item_reports'][sale.item.name]) = {
-                'item_num': sale.item_num,
-                'amount': sale.amount
-            }
+        # 集計
+        aggregate_reports(monthly_sale_reports)
 
         """ 過去3日間 """
         # saleの販売日をタプルに変換 => (2018,12,31)
@@ -205,26 +208,8 @@ def statistics(request):
             day=saled_at_date.day
         )
 
-        # 対象期間外のsaleであれば何も処理しない
-        if saled_at not in daily_sale_reports.keys():
-            continue
-
-        # 対象日の売上総額を加算
-        daily_sale_reports[saled_at]['amount'] += sale.amount
-        # item_reportsにsaleの果物がキーとして存在するとき
-        if (sale.item.name in
-                daily_sale_reports[saled_at]['item_reports']):
-            (daily_sale_reports[saled_at]['item_reports']
-             [sale.item.name]['item_num']) += sale.item_num
-            (daily_sale_reports[saled_at]['item_reports']
-             [sale.item.name]['amount']) += sale.amount
-        # item_reportsにsaleの果物がキーとして存在しないとき
-        else:
-            (daily_sale_reports[saled_at]
-             ['item_reports'][sale.item.name]) = {
-                'item_num': sale.item_num,
-                'amount': sale.amount
-            }
+        # 集計
+        aggregate_reports(daily_sale_reports)
 
     return render(request, 'sales/statistics.html', {
         'entire_sales_amount': entire_sales_amount,
